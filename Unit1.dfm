@@ -23,7 +23,6 @@ object Form1: TForm1
     Height = 19
     Panels = <>
     SimplePanel = True
-    ExplicitTop = 281
   end
   object JvPanel1: TJvPanel
     Left = 0
@@ -38,7 +37,6 @@ object Form1: TForm1
     Align = alLeft
     Caption = 'JvPanel1'
     TabOrder = 1
-    ExplicitHeight = 281
     object mChars: TJvMemo
       Left = 1
       Top = 1
@@ -52,7 +50,6 @@ object Form1: TForm1
         '<edit this>')
       TabOrder = 0
       WordWrap = False
-      ExplicitHeight = 279
     end
   end
   object JvPanel2: TJvPanel
@@ -68,7 +65,6 @@ object Form1: TForm1
     Align = alClient
     Caption = 'JvPanel2'
     TabOrder = 2
-    ExplicitHeight = 281
     object JvSplitter1: TJvSplitter
       Left = 1
       Top = 113
@@ -98,7 +94,6 @@ object Form1: TForm1
       PopupMenu = JvPopupMenu1
       TabOrder = 1
       WordWrap = False
-      ExplicitHeight = 164
     end
   end
   object xml: TJvSimpleXML

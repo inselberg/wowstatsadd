@@ -273,7 +273,7 @@ begin
   for i := 0 to mChars.Lines.Count - 1 do
   begin
     str := mChars.Lines[i];
-    realm := copy(str, 1, pos(':', str) - 1);
+    realm := trim(copy(str, 1, pos(':', str) - 1));
     strreplace(realm, ' ', '+', [rfReplaceAll]);
 
     str := copy(str, pos(':', str) + 1, length(str));
