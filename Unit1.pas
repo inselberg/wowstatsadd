@@ -7,7 +7,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, StdCtrls, JvExStdCtrls, JvMemo, JvSimpleXml, IdBaseComponent, IdComponent, IdTCPConnection,
   IdTCPClient, IdHTTP, ComCtrls, JvExComCtrls, JvStatusBar, ExtCtrls, JvExExtCtrls, JvExtComponent, JvPanel, JvListView,
-  JvComCtrls, JvSplitter;
+  JvComCtrls, JvSplitter, JvMenus;
 
 type
   TForm1 = class(TForm)
@@ -24,15 +24,27 @@ type
     JvSplitter1: TJvSplitter;
     miAbout: TMenuItem;
     JvMemo1: TJvMemo;
+    miInclude: TMenuItem;
+    miIncAll: TMenuItem;
+    N1: TMenuItem;
+    miIncClassic: TMenuItem;
+    miIncBC: TMenuItem;
+    miIncWotlk: TMenuItem;
+    JvPopupMenu1: TJvPopupMenu;
+    pmSort: TMenuItem;
+    pmUnsort: TMenuItem;
     procedure miGetItClick(Sender: TObject);
     procedure IdHTTP1WorkEnd(ASender: TObject; AWorkMode: TWorkMode);
     procedure miCalcItClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure pmSortClick(Sender: TObject);
+    procedure pmUnsortClick(Sender: TObject);
   private
     { Private-Deklarationen }
     bWait: boolean;
+    bSorted: boolean;
   public
     { Public-Deklarationen }
     procedure BuildTree(fn: string; var tv: TJvTreeView);
@@ -46,6 +58,13 @@ implementation
 
 {$R *.dfm}
 
+function lz(s: String; max: byte): string;
+begin
+  while length(s) < max do
+    s := '0' + s;
+  result := s;
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   try
@@ -53,6 +72,8 @@ begin
   except
 
   end;
+
+  bSorted := not false;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -77,9 +98,8 @@ end;
 procedure TForm1.miCalcItClick(Sender: TObject);
 var
   SR: TSearchRec;
-
 begin
-
+  JvMemo1.Lines.Clear;
   JvTreeView1.Items.Clear;
   if FindFirst('char_*.xml', faAnyFile, SR) = 0 then
   begin
@@ -91,7 +111,7 @@ begin
     until FindNext(SR) <> 0;
     FindClose(SR); // Nach jedem findfirst nötig, um sr freizugeben!
   end;
-  JvMemo1.Lines.Clear;
+
   JvMemo1.Lines.AddStrings(CalcTree(JvTreeView1));
 end;
 
@@ -103,11 +123,13 @@ var
   str, cat, visited: string;
   found: longint;
   slcat, slvisited: tstringlist;
+  v, max: longint;
 begin
   slcat := tstringlist.create;
   slvisited := tstringlist.create;
 
   j := 0;
+  max := 0;
   for i := 0 to tvdata.Items.Count - 1 do
   begin
     str := tvdata.Items.item[i].Text;
@@ -116,24 +138,44 @@ begin
     begin
       cat := trim(copy(str, 1, p - 1));
       visited := trim(copy(str, p + 1, length(str)));
+
       found := slcat.indexof(cat);
 
       if found = -1 then
       begin
         slcat.Add(cat);
         slvisited.Add(visited);
+        // reine kosmetik bei der sortierten tabelle
+        v := strtoint(visited);
+        if v > max then
+          max := v;
       end
       else
-
+      begin
         slvisited[found] := inttostr(strtoint(slvisited[found]) + strtoint(visited));
+        // reine kosmetik bei der sortierten tabelle
+        v := strtoint(slvisited[found]);
+        if v > max then
+          max := v;
 
+      end;
     end;
   end;
 
   for i := 0 to slcat.Count - 1 do
-    slcat[i] := slcat[i] + ' | ' + slvisited[i];
+    slcat[i] := lz(slvisited[i], length(inttostr(max))) + ' | ' + slcat[i];
 
-  // JvStatusBar1.simpletext := inttostr(slcat.Count) + ' ' + inttostr(tvresult.Items.Count) + ' ' + inttostr(j);
+  // sortiern und umdrehen
+  if bSorted then
+  begin
+    slvisited.Assign(slcat);
+    slvisited.sort;
+    slcat.Clear;
+    for i := slvisited.Count - 1 downto 1 do
+      slcat.Add(slvisited[i]);
+  end;
+
+  JvStatusBar1.simpletext := 'ready.';
   slvisited.free;
 
   // slcat.free;
@@ -226,15 +268,14 @@ begin
     str := copy(str, pos(':', str) + 1, length(str));
     sl.DelimitedText := str;
 
-    str:=realm;
+    str := realm;
     for j := 0 to sl.Count - 1 do
     begin
       JvStatusBar1.simpletext := 'getting ' + sl[j] + ' on ' + realm + '....';
       url := 'http://eu.wowarmory.com/character-statistics.xml?r=' + realm + '&cn=' + sl[j] + '&c=14807';
 
-
       strreplace(str, '+', '_', [rfReplaceAll]);
-      fn := 'char_' + sl[j]+'_' +str+ '.xml';
+      fn := 'char_' + sl[j] + '_' + str + '.xml';
 
       bWait := true;
       xml.LoadFromString(IdHTTP1.get(url));
@@ -251,6 +292,19 @@ begin
   JvStatusBar1.simpletext := 'click CalcIt ;)';
   miGetIt.Enabled := true;
   sl.free;
+end;
+
+procedure TForm1.pmSortClick(Sender: TObject);
+begin
+  bSorted := true;
+  miCalcItClick(sender);
+end;
+
+procedure TForm1.pmUnsortClick(Sender: TObject);
+begin
+  bSorted := false;
+  miCalcItClick(sender);
+
 end;
 
 end.

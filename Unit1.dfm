@@ -90,6 +90,8 @@ object Form1: TForm1
       Indent = 19
       TabOrder = 0
       LineColor = clScrollBar
+      ExplicitLeft = 129
+      ExplicitTop = -15
     end
     object JvMemo1: TJvMemo
       Left = 1
@@ -97,18 +99,19 @@ object Form1: TForm1
       Width = 448
       Height = 164
       Align = alClient
+      PopupMenu = JvPopupMenu1
       TabOrder = 1
       WordWrap = False
     end
   end
   object xml: TJvSimpleXML
     IndentString = '  '
-    Left = 456
+    Left = 568
     Top = 64
   end
   object MainMenu1: TMainMenu
-    Left = 72
-    Top = 32
+    Left = 392
+    Top = 8
     object miGetIt: TMenuItem
       Caption = 'GetIt'
       OnClick = miGetItClick
@@ -116,6 +119,25 @@ object Form1: TForm1
     object miCalcIt: TMenuItem
       Caption = 'CalcIt'
       OnClick = miCalcItClick
+      object miInclude: TMenuItem
+        Caption = 'include'
+        object miIncAll: TMenuItem
+          Caption = 'all'
+          Checked = True
+        end
+        object N1: TMenuItem
+          Caption = '-'
+        end
+        object miIncClassic: TMenuItem
+          Caption = 'classic'
+        end
+        object miIncBC: TMenuItem
+          Caption = 'bc'
+        end
+        object miIncWotlk: TMenuItem
+          Caption = 'wotlk'
+        end
+      end
     end
     object miAbout: TMenuItem
       Caption = 'About'
@@ -132,7 +154,25 @@ object Form1: TForm1
     Request.BasicAuthentication = False
     Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
     HTTPOptions = [hoForceEncodeParams]
-    Left = 264
-    Top = 24
+    Left = 520
+    Top = 64
+  end
+  object JvPopupMenu1: TJvPopupMenu
+    ImageMargin.Left = 0
+    ImageMargin.Top = 0
+    ImageMargin.Right = 0
+    ImageMargin.Bottom = 0
+    ImageSize.Height = 0
+    ImageSize.Width = 0
+    Left = 448
+    Top = 8
+    object pmSort: TMenuItem
+      Caption = 'sort'
+      OnClick = pmSortClick
+    end
+    object pmUnsort: TMenuItem
+      Caption = 'unsort'
+      OnClick = pmUnsortClick
+    end
   end
 end
