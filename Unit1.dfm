@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 300
+  ClientHeight = 320
   ClientWidth = 635
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,17 +18,18 @@ object Form1: TForm1
   TextHeight = 13
   object JvStatusBar1: TJvStatusBar
     Left = 0
-    Top = 281
+    Top = 301
     Width = 635
     Height = 19
     Panels = <>
     SimplePanel = True
+    ExplicitTop = 281
   end
   object JvPanel1: TJvPanel
     Left = 0
     Top = 0
     Width = 185
-    Height = 281
+    Height = 301
     HotTrackFont.Charset = DEFAULT_CHARSET
     HotTrackFont.Color = clWindowText
     HotTrackFont.Height = -11
@@ -37,11 +38,12 @@ object Form1: TForm1
     Align = alLeft
     Caption = 'JvPanel1'
     TabOrder = 1
+    ExplicitHeight = 281
     object mChars: TJvMemo
       Left = 1
       Top = 1
       Width = 183
-      Height = 279
+      Height = 299
       Align = alClient
       Lines.Strings = (
         'servername: char char char'
@@ -50,15 +52,14 @@ object Form1: TForm1
         '<edit this>')
       TabOrder = 0
       WordWrap = False
-      ExplicitLeft = -3
-      ExplicitTop = -4
+      ExplicitHeight = 279
     end
   end
   object JvPanel2: TJvPanel
     Left = 185
     Top = 0
     Width = 450
-    Height = 281
+    Height = 301
     HotTrackFont.Charset = DEFAULT_CHARSET
     HotTrackFont.Color = clWindowText
     HotTrackFont.Height = -11
@@ -67,10 +68,7 @@ object Form1: TForm1
     Align = alClient
     Caption = 'JvPanel2'
     TabOrder = 2
-    ExplicitLeft = 360
-    ExplicitTop = 120
-    ExplicitWidth = 185
-    ExplicitHeight = 41
+    ExplicitHeight = 281
     object JvSplitter1: TJvSplitter
       Left = 1
       Top = 113
@@ -90,18 +88,17 @@ object Form1: TForm1
       Indent = 19
       TabOrder = 0
       LineColor = clScrollBar
-      ExplicitLeft = 129
-      ExplicitTop = -15
     end
     object JvMemo1: TJvMemo
       Left = 1
       Top = 116
       Width = 448
-      Height = 164
+      Height = 184
       Align = alClient
       PopupMenu = JvPopupMenu1
       TabOrder = 1
       WordWrap = False
+      ExplicitHeight = 164
     end
   end
   object xml: TJvSimpleXML
@@ -116,32 +113,44 @@ object Form1: TForm1
       Caption = 'GetIt'
       OnClick = miGetItClick
     end
-    object miCalcIt: TMenuItem
-      Caption = 'CalcIt'
-      OnClick = miCalcItClick
+    object miCalc: TMenuItem
+      Caption = 'Calc'
+      object miCalcIt: TMenuItem
+        Caption = 'Calc It'
+        OnClick = miCalcItClick
+      end
+      object N2: TMenuItem
+        Caption = '-'
+      end
       object miInclude: TMenuItem
         Caption = 'include'
         object miIncAll: TMenuItem
           Caption = 'all'
           Checked = True
+          OnClick = miIncAllClick
         end
         object N1: TMenuItem
           Caption = '-'
         end
         object miIncClassic: TMenuItem
-          Caption = 'classic'
+          Caption = 'Classic'
+          Checked = True
+          OnClick = miIncAllClick
         end
         object miIncBC: TMenuItem
-          Caption = 'bc'
+          Caption = 'The Burning Crusade'
+          Checked = True
+          OnClick = miIncAllClick
         end
         object miIncWotlk: TMenuItem
-          Caption = 'wotlk'
+          Caption = 'Wrath of the Lich King'
+          Checked = True
+          OnClick = miIncAllClick
         end
       end
     end
     object miAbout: TMenuItem
       Caption = 'About'
-      OnClick = miAboutClick
     end
   end
   object IdHTTP1: TIdHTTP

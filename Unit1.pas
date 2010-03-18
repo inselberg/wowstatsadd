@@ -17,7 +17,7 @@ type
     miGetIt: TMenuItem;
     IdHTTP1: TIdHTTP;
     JvStatusBar1: TJvStatusBar;
-    miCalcIt: TMenuItem;
+    miCalc: TMenuItem;
     JvPanel1: TJvPanel;
     JvTreeView1: TJvTreeView;
     JvPanel2: TJvPanel;
@@ -33,14 +33,16 @@ type
     JvPopupMenu1: TJvPopupMenu;
     pmSort: TMenuItem;
     pmUnsort: TMenuItem;
+    N2: TMenuItem;
+    miCalcIt: TMenuItem;
     procedure miGetItClick(Sender: TObject);
     procedure IdHTTP1WorkEnd(ASender: TObject; AWorkMode: TWorkMode);
-    procedure miCalcItClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure miAboutClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure pmSortClick(Sender: TObject);
     procedure pmUnsortClick(Sender: TObject);
+    procedure miIncAllClick(Sender: TObject);
+    procedure miCalcItClick(Sender: TObject);
   private
     { Private-Deklarationen }
     bWait: boolean;
@@ -90,29 +92,25 @@ begin
   bWait := false;
 end;
 
-procedure TForm1.miAboutClick(Sender: TObject);
-begin
-  CalcTree(JvTreeView1);
-end;
-
 procedure TForm1.miCalcItClick(Sender: TObject);
 var
-  SR: TSearchRec;
+  sr: TSearchRec;
 begin
   JvMemo1.Lines.Clear;
   JvTreeView1.Items.Clear;
-  if FindFirst('char_*.xml', faAnyFile, SR) = 0 then
+  if FindFirst('char_*.xml', faAnyFile, sr) = 0 then
   begin
     repeat
 
-      if SR.Name[1] <> '.' then
-        BuildTree(SR.name, JvTreeView1);
+      if sr.Name[1] <> '.' then
+        BuildTree(sr.name, JvTreeView1);
 
-    until FindNext(SR) <> 0;
-    FindClose(SR); // Nach jedem findfirst nötig, um sr freizugeben!
+    until FindNext(sr) <> 0;
+    FindClose(sr);
   end;
 
   JvMemo1.Lines.AddStrings(CalcTree(JvTreeView1));
+
 end;
 
 //
@@ -193,6 +191,7 @@ var
   e, ee: TJclSimpleXMLElems;
   root, node: TTreeNode;
   ctrl: integer;
+  b: boolean;
 begin
   //
   xml.LoadFromFile(fn);
@@ -205,39 +204,51 @@ begin
   for i := 0 to xml.root.Items.Count - 1 do
   begin
     e := xml.root.Items[i].Items;
-    // JvMemo1.Lines.Add(inttostr(e.Count));
-    for j := 0 to e.Count - 1 do
-    begin
-      ee := e.item[j].Items;
-      s := trim(e.item[j].value);
-      if s <> '' then
-        node := tv.Items.AddChild(root, s);
+    s := e.item[0].Value;
 
-      {
-        for k := 0 to ee.Count - 1 do
-        begin
-        s := trim(ee.Item[k].value);
-        if ( s <> '' ) and ( k = 1) then
-        jvTreeView1.Items.AddChild(node,s);
-        JvMemo1.Lines.Add(s);
-        end;
-        }
+    // merkwürdiges konstrukt  - bei langeweile optimieren
+    b := miIncAll.Checked;
+    if (s = 'Classic') then
+      b := (miIncClassic.Checked)
+    else if (s = 'The Burning Crusade') then
+      b := (miIncBC.Checked)
+    else if (s = 'Wrath of the Lich King') then
+      b := (miIncWotlk.Checked);
 
-      // 1=name 0=count
-      if ee.Count = 2 then
+    if b then
+      for j := 0 to e.Count - 1 do
       begin
-        cat := trim(ee.item[1].value);
-        // visited := strtoint(trim(ee.Item[0].value));
-        val(trim(ee.item[0].value), visited, ctrl);
-        if (cat <> '') and (ctrl = 0) then
-          tv.Items.AddChild(node, cat + ' | ' + inttostr(visited));
 
+        ee := e.item[j].Items;
+        s := trim(e.item[j].Value);
+        if s <> '' then
+          node := tv.Items.AddChild(root, s);
+
+        {
+          for k := 0 to ee.Count - 1 do
+          begin
+          s := trim(ee.Item[k].value);
+          if ( s <> '' ) and ( k = 1) then
+          jvTreeView1.Items.AddChild(node,s);
+          JvMemo1.Lines.Add(s);
+          end;
+          }
+
+        // 1=name 0=count
+        if ee.Count = 2 then
+        begin
+          cat := trim(ee.item[1].Value);
+          // visited := strtoint(trim(ee.Item[0].value));
+          val(trim(ee.item[0].Value), visited, ctrl);
+          if (cat <> '') and (ctrl = 0) then
+            tv.Items.AddChild(node, cat + ' | ' + inttostr(visited));
+
+        end;
+
+        // 1=name 0=count
+        // s:=ee.Item[k].value
+        /// jvTreeView1.Items.AddChild(node,s);
       end;
-
-      // 1=name 0=count
-      // s:=ee.Item[k].value
-      /// jvTreeView1.Items.AddChild(node,s);
-    end;
 
   end;
   // lv.LoadFromStrings(jvmemo1.Lines,'|');
@@ -294,16 +305,33 @@ begin
   sl.free;
 end;
 
+procedure TForm1.miIncAllClick(Sender: TObject);
+var
+   n: string;
+begin
+  n := (Sender as TMenuItem).name;
+  with (Sender as TMenuItem) do
+     Checked := not Checked;
+
+  if n = 'miIncAll' then
+  begin
+    miIncClassic.Checked := true;
+    miIncBC.Checked := true;
+    miIncWotlk.Checked := true;
+  end
+
+end;
+
 procedure TForm1.pmSortClick(Sender: TObject);
 begin
   bSorted := true;
-  miCalcItClick(sender);
+  miCalcItClick(Sender);
 end;
 
 procedure TForm1.pmUnsortClick(Sender: TObject);
 begin
   bSorted := false;
-  miCalcItClick(sender);
+  miCalcItClick(Sender);
 
 end;
 
